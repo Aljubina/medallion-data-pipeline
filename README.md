@@ -72,11 +72,17 @@ The pipeline follows the **Medallion Architecture**:
 ---
 
 ## Project Structure
+
+## Project Structure
+
+```text
 medallion-data-quality-pipeline/
 ├── data/
 │   ├── bronze/
 │   ├── silver/
 │   └── gold/
+├── docs/
+├── notebooks/
 ├── scripts/
 │   ├── bronze/
 │   │   └── 01_load_bronze.py
@@ -95,9 +101,10 @@ medallion-data-quality-pipeline/
 │       ├── create_dim_date.sql
 │       ├── create_fact_sales.sql
 │       └── analytical_queries.sql
+├── tests/
 ├── README.md
 └── requirements.txt
-
+```
 ---
 
 ##  Pipeline Flow
@@ -157,10 +164,12 @@ pip install -r requirements.txt
 ```
 
 3. Prepare the Data
-Place your raw dataset files inside the data/bronze/ directory before starting the pipeline.
 
-4. Execute the Pipeline
-Run the pipeline scripts sequentially:
+   Place your raw dataset files inside the data/bronze/ directory before starting the pipeline.
+
+5. Execute the Pipeline
+
+   Run the pipeline scripts sequentially:
 
 ```bash
 # Step 1: Ingest raw data into Bronze layer
@@ -174,7 +183,8 @@ python scripts/gold/03_load_gold.py
 ```
 
 5. Data Analysis & Queries
-Use the SQL scripts located in the sql/ directory for schema creation, views, and downstream analytical queries:
+
+   Use the SQL scripts located in the sql/ directory for schema creation, views, and downstream analytical queries:
 
 ```bash
 # Executable via your database CLI or SQL client
@@ -225,5 +235,6 @@ Out of Scope
 - Building a clean and reproducible data pipeline
 - Combining Python and SQL for data engineering tasks
 
-Author
+### Author
+
 Aljubina Gavit
