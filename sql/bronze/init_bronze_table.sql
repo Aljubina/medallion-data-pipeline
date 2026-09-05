@@ -14,6 +14,8 @@ CREATE DATABASE DataWarehouse;
 
 USE DataWarehouse;
 
+DROP TABLE IF EXISTS bronze_sales;
+
 -- Bronze Layer: Raw data as-is + metadata
 CREATE TABLE IF NOT EXISTS bronze_sales (
     row_id              INT,
