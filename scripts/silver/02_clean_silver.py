@@ -64,3 +64,7 @@ print(df.nunique())
 
 print("\nSales statistics:")
 print(df["sales"].describe())
+
+
+# ================================
+# 5. Profiling Checks
