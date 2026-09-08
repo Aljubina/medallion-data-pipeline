@@ -55,6 +55,38 @@ jupyter notebook scripts/silver/02_quality_report.ipynb
 
 ## Quality Issue Remediation Matrix
 
+| Rule ID | Quality Issue               | Evidence                                                               | Business Rule                                                                    | Remediation                                    | Validation                             |
+| ------- | --------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------- | -------------------------------------- |
+| DQ-001  | Missing postal codes        | 11 records (0.112%), all Burlington, Vermont                           | Postal code is not available for these records; do not fabricate geographic data | Preserve as `NULL`                             | `postal_code` null count remains 11    |
+| DQ-002  | Dates stored as strings     | Bronze `order_date`/`ship_date` are strings                            | Dates should be stored as proper `DATE` values in Silver                         | Convert to datetime                            | No invalid/NULL dates after conversion |
+| DQ-003  | Duplicate full rows         | 0 found                                                                | Silver should not contain exact duplicate records                                | `drop_duplicates()`                            | Duplicate count = 0                    |
+| DQ-004  | Duplicate `row_id`          | 0 found                                                                | `row_id` should uniquely identify each source record                             | No remediation required                        | `row_id.nunique() == len(df)`          |
+| DQ-005  | Invalid date values         | 0 found                                                                | Every order and ship date must be valid                                          | No records removed; validate dates             | Invalid date count = 0                 |
+| DQ-006  | Ship date before order date | 0 found; delay 0–7 days                                                | Shipment cannot occur before order                                               | No remediation required; validate relationship | `ship_date >= order_date`              |
+| DQ-007  | Negative/zero sales         | 0 found                                                                | Sales must be greater than zero                                                  | No remediation required; validate              | `(sales <= 0).sum() == 0`              |
+| DQ-008  | Whitespace issues           | 0 found                                                                | Text values should not contain unnecessary leading/trailing whitespace           | No remediation required; validation            | Whitespace issue count = 0             |
+| DQ-009  | Sales precision             | Bronze contains values such as `957.5775`; Silver uses `DECIMAL(12,2)` | Silver sales should use consistent monetary precision                            | Round to 2 decimal places                      | All sales have 2-decimal precision     |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 | Quality Issue                  | Evidence                                                                                                            | Business Rule                                                                                            | Remediation                                                                                                                       | Validation                                                                                  |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | Missing values                 | The notebook prints null counts for every column.                                                                   | Required business fields must not be null.                                                               | Fill values using an approved default where appropriate; otherwise quarantine the record for review.                              | Re-run the null-count check and confirm that required fields have zero nulls.               |
