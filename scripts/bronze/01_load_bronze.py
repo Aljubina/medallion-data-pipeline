@@ -173,3 +173,6 @@ print(f"Total ETL Time: {etl_end - etl_start:.2f} seconds")
 print("-----------------------------------------------------")
 print("END ETL")
 print("-----------------------------------------------------")
+
+
+print(df.dtypes)

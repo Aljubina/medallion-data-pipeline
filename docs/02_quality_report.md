@@ -55,52 +55,21 @@ jupyter notebook scripts/silver/02_quality_report.ipynb
 
 ## Quality Issue Remediation Matrix
 
-| Rule ID | Quality Issue               | Evidence                                                               | Business Rule                                                                    | Remediation                                    | Validation                             |
-| ------- | --------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------- | -------------------------------------- |
-| DQ-001  | Missing postal codes        | 11 records (0.112%), all Burlington, Vermont                           | Postal code is not available for these records; do not fabricate geographic data | Preserve as `NULL`                             | `postal_code` null count remains 11    |
-| DQ-002  | Dates stored as strings     | Bronze `order_date`/`ship_date` are strings                            | Dates should be stored as proper `DATE` values in Silver                         | Convert to datetime                            | No invalid/NULL dates after conversion |
-| DQ-003  | Duplicate full rows         | 0 found                                                                | Silver should not contain exact duplicate records                                | `drop_duplicates()`                            | Duplicate count = 0                    |
-| DQ-004  | Duplicate `row_id`          | 0 found                                                                | `row_id` should uniquely identify each source record                             | No remediation required                        | `row_id.nunique() == len(df)`          |
-| DQ-005  | Invalid date values         | 0 found                                                                | Every order and ship date must be valid                                          | No records removed; validate dates             | Invalid date count = 0                 |
-| DQ-006  | Ship date before order date | 0 found; delay 0–7 days                                                | Shipment cannot occur before order                                               | No remediation required; validate relationship | `ship_date >= order_date`              |
-| DQ-007  | Negative/zero sales         | 0 found                                                                | Sales must be greater than zero                                                  | No remediation required; validate              | `(sales <= 0).sum() == 0`              |
-| DQ-008  | Whitespace issues           | 0 found                                                                | Text values should not contain unnecessary leading/trailing whitespace           | No remediation required; validation            | Whitespace issue count = 0             |
-| DQ-009  | Sales precision             | Bronze contains values such as `957.5775`; Silver uses `DECIMAL(12,2)` | Silver sales should use consistent monetary precision                            | Round to 2 decimal places                      | All sales have 2-decimal precision     |
+| Rule ID | Quality Issue               | Evidence                                                     | Business Rule                                  | Remediation             | Validation                              |
+| ------- | --------------------------- | ------------------------------------------------------------ | ---------------------------------------------- | ----------------------- | --------------------------------------- |
+| DQ-001  | Missing postal codes        | 11 records (0.112%)                                          | Do not fabricate missing geographic data       | Preserve as `NULL`      | Missing count remains 11                |
+| DQ-002  | Dates stored as strings     | `order_date` and `ship_date` are strings in Bronze           | Silver dates must use proper `DATE` type       | Convert to datetime     | No invalid dates after conversion       |
+| DQ-003  | Duplicate full rows         | 0                                                            | Silver should not contain exact duplicates     | `drop_duplicates()`     | Duplicate count = 0                     |
+| DQ-004  | Duplicate `row_id`          | 0                                                            | `row_id` must uniquely identify source records | No remediation required | `row_id.nunique() == len(df)`           |
+| DQ-005  | Invalid dates               | 0                                                            | All dates must be valid                        | No remediation required | Invalid date count = 0                  |
+| DQ-006  | Ship date before order date | 0                                                            | `ship_date >= order_date`                      | No remediation required | Violations = 0                          |
+| DQ-007  | Invalid sales               | No negative/zero values                                      | Sales must be positive                         | No remediation required | `(sales <= 0).sum() == 0`               |
+| DQ-008  | Text whitespace             | None                                                         | Text should be consistently formatted          | No remediation required | No whitespace issues                    |
+| DQ-009  | Invalid categorical values  | None                                                         | Categories must use expected values            | No remediation required | All values belong to expected sets      |
+| DQ-010  | Sales precision             | Values include 4 decimal places; Silver uses `DECIMAL(12,2)` | Monetary values should use 2-decimal precision | Round to 2 decimals     | `sales` conforms to 2-decimal precision |
+| DQ-011  | Repeated `order_id`         | 4,878 repeated values                                        | Multiple product lines may belong to one order | **Do not remove**       | `row_id` remains unique                 |
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-| Quality Issue                  | Evidence                                                                                                            | Business Rule                                                                                            | Remediation                                                                                                                       | Validation                                                                                  |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Missing values                 | The notebook prints null counts for every column.                                                                   | Required business fields must not be null.                                                               | Fill values using an approved default where appropriate; otherwise quarantine the record for review.                              | Re-run the null-count check and confirm that required fields have zero nulls.               |
-| Duplicate records              | The notebook prints the number of duplicate full rows.                                                              | Each source transaction should be represented once.                                                      | Remove exact duplicate rows while preserving the original source record and load metadata.                                        | Confirm that `df.duplicated().sum()` returns zero.                                          |
-| Duplicate `row_id` values      | The notebook prints duplicate `row_id` count and the identifier range.                                              | `row_id` should uniquely identify a source row.                                                          | Investigate conflicting records and retain the valid record or assign a controlled surrogate key.                                 | Confirm that duplicate `row_id` values are resolved and the identifier range is documented. |
-| Invalid order dates            | The notebook prints the number of `order_date` values that fail date parsing.                                       | Every valid order must have a parseable order date.                                                      | Parse the source date using the expected day-first format; quarantine values that cannot be converted.                            | Confirm that the invalid order-date count is zero in the cleaned dataset.                   |
-| Invalid ship dates             | The notebook prints the number of `ship_date` values that fail date parsing.                                        | Every shipped order must have a parseable ship date.                                                     | Parse the source date using the expected day-first format; quarantine values that cannot be converted.                            | Confirm that the invalid ship-date count is zero in the cleaned dataset.                    |
-| Invalid date sequence          | The notebook counts rows where `ship_date` is earlier than `order_date`.                                            | A shipment cannot occur before its order.                                                                | Correct the dates from the source when possible; otherwise quarantine the record.                                                 | Confirm that `ship_date >= order_date` for all retained records.                            |
-| Negative sales                 | The notebook prints the count of negative `sales` values.                                                           | Sales amounts must not be negative unless an approved return or credit process exists.                   | Investigate the source transaction and correct, reclassify, or quarantine the value.                                              | Confirm that no unauthorized negative sales remain.                                         |
-| Zero sales                     | The notebook prints the count of `sales` values equal to zero.                                                      | A sales transaction should have a positive amount unless zero-value transactions are explicitly allowed. | Confirm whether the row is a valid free item, cancelled order, or source error; then retain or quarantine it according to policy. | Confirm that remaining zero-sales rows are documented and approved.                         |
-| Leading or trailing whitespace | The notebook checks every text column for values that change after `strip()`.                                       | Text attributes must be normalized for reliable joins, grouping, and filtering.                          | Trim leading and trailing whitespace from string columns.                                                                         | Re-run the whitespace check and confirm no unapproved whitespace remains.                   |
-| Missing postal codes           | The notebook prints all rows with a null `postal_code`.                                                             | Postal code should be populated when available, but missing geography must not be fabricated.            | Preserve the null or use a verified source value; do not infer an unsupported postal code.                                        | Confirm missing postal-code rows are counted and documented.                                |
-| Unexpected categorical values  | The notebook prints distributions for ship mode, segment, region, category, sub-category, country, city, and state. | Categorical values must match the approved source-system domain.                                         | Standardize spelling and casing, map known aliases, and quarantine values outside the approved domain.                            | Compare distinct cleaned values with the approved domain lists.                             |
-| Incorrect data types           | The notebook prints source data types, while Bronze stores dates as text.                                           | Silver dates and measures must use analytics-ready data types.                                           | Convert dates to `DATE` and sales to a numeric decimal type in the Silver layer.                                                  | Confirm Silver schema types and verify that conversion errors are zero.                     |
 
 ## Expected Bronze columns
 
