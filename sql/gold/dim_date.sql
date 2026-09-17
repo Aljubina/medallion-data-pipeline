@@ -2,7 +2,7 @@
 -- DIM_DATE TABLE
 
 CREATE TABLE IF NOT EXISTS dim_date (
-	date_key INT AUTO_INCREMENT PRIMARY KEY,
+	date_key INT PRIMARY KEY,
     full_date DATE,
     year INT,
     month INT,
