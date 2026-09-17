@@ -68,6 +68,7 @@ jupyter notebook scripts/silver/02_quality_report.ipynb
 | DQ-009  | Invalid categorical values  | None                                                         | Categories must use expected values            | No remediation required | All values belong to expected sets      |
 | DQ-010  | Sales precision             | Values include 4 decimal places; Silver uses `DECIMAL(12,2)` | Monetary values should use 2-decimal precision | Round to 2 decimals     | `sales` conforms to 2-decimal precision |
 | DQ-011  | Repeated `order_id`         | 4,878 repeated values                                        | Multiple product lines may belong to one order | **Do not remove**       | `row_id` remains unique                 |
+| DQ-012  | Multiple product names for same `product_id` | 32 product IDs have 2 distinct product names | Product dimension should have one record per product ID | Investigate source inconsistency; preserve source records until business rule is established |
 
 
 
