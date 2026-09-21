@@ -34,3 +34,47 @@ dim_date	1230
 fact_sales	9800
 */
 
+
+-- ============= VALIDATE CUSTOMER ================== --
+
+SELECT
+    COUNT(*) AS total_rows,
+    COUNT(DISTINCT customer_id) AS unique_customer_ids
+FROM dim_customer;
+
+-- total_rows = unique_customer_ids -- 
+
+-- Check Nulls --
+SELECT *
+FROM dim_customer
+WHERE customer_id IS NULL
+   OR customer_name IS NULL
+   OR segment IS NULL;
+
+-- ================ VALIDATE PRODUCT ===================== --
+
+SELECT
+    COUNT(*) AS total_product_records,
+    COUNT(DISTINCT product_id) AS unique_product_ids,
+    COUNT(DISTINCT product_name) AS unique_product_names
+FROM dim_product;
+	
+    
+-- product id present more than 1's    -- 
+SELECT
+    product_id,
+    COUNT(DISTINCT product_name) AS product_name_count
+FROM dim_product
+GROUP BY product_id
+HAVING COUNT(DISTINCT product_name) > 1;
+
+-- check null -- 
+SELECT *
+FROM dim_product
+WHERE product_id IS NULL
+   OR product_name IS NULL
+   OR category IS NULL
+   OR sub_category IS NULL;
+
+   
+
