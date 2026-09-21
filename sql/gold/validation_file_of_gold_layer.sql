@@ -77,4 +77,30 @@ WHERE product_id IS NULL
    OR sub_category IS NULL;
 
    
+   
+-- ========== VALIDATE LOCATION ========= --
+
+SELECT
+    COUNT(*) AS total_locations,
+    COUNT(DISTINCT CONCAT_WS('|',
+        country,
+        city,
+        state,
+        postal_code,
+        region
+    )) AS unique_locations
+FROM dim_location;
+
+-- CHECK NULL -- 
+SELECT *
+FROM dim_location
+WHERE country IS NULL
+   OR city IS NULL
+   OR state IS NULL
+   OR region IS NULL;
+   
+-- MISSING POSTAL CODES -- 
+SELECT COUNT(*) AS missing_postal_codes
+FROM dim_location
+WHERE postal_code IS NULL;
 
